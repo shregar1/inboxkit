@@ -8,22 +8,22 @@ Layout:
   errors/        IError + concrete errors
   utilities/     IUtility helpers
   factories/     IFactory / ProviderFactory
-  router/        TempMail public router (use this)
+  router/        InboxKit public router (use this)
   services/      IService orchestration + providers/
 
 Usage:
-  from inboxkit import TempMail, RouterMode
+  from inboxkit import InboxKit, RouterMode
 
   # sticky — pinned provider, no fallback
-  tm = TempMail("mail.tm")
+  tm = InboxKit("mail.tm")
   inbox = tm.create()
 
   # fallback — internal DEFAULT_ORDER
-  tm = TempMail()
+  tm = InboxKit()
   inbox = tm.create()
 
   # fallback — custom order
-  tm = TempMail(mode=RouterMode.FALLBACK, order=["tempmail.net", "mail.tm"])
+  tm = InboxKit(mode=RouterMode.FALLBACK, order=["tempmail.net", "mail.tm"])
   tm.set_order(["guerrillamail", "1secmail"])
 
 Agent handover (full usage guide):
@@ -82,7 +82,10 @@ from inboxkit.factories import (
     ProviderFactory,
     ProviderRegistration,
 )
-from inboxkit.router import ITempMailRouter, TempMail
+from inboxkit.router import IInboxKitRouter, InboxKit
+
+TempMail = InboxKit  # back-compat alias
+
 from inboxkit.services import (
     InboxService,
     IProviderGenerateService,
@@ -132,7 +135,7 @@ __all__ = [
     "IProviderInboxService",
     "IProviderService",
     "IService",
-    "ITempMailRouter",
+    "IInboxKitRouter",
     "IUtility",
     "InboxNotBoundError",
     "InboxService",
@@ -153,6 +156,7 @@ __all__ = [
     "SecMailError",
     "SmailProError",
     "TempInbox",
+    "InboxKit",
     "TempMail",
     "TempMailAppError",
     "TempMailError",

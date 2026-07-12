@@ -21,3 +21,6 @@ build/
 .vscode/
 *.db
 *.sqlite
+coverage.json
+.coverage
+htmlcov/

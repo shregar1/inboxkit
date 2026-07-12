@@ -1,4 +1,4 @@
-"""Public-facing TempMail router — sticky or fallback provider selection."""
+"""Public-facing InboxKit router — sticky or fallback provider selection."""
 
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ from inboxkit.errors import (
 )
 from inboxkit.factories import ProviderFactory
 from inboxkit.models import TempInbox
-from inboxkit.router.abstraction import ITempMailRouter
+from inboxkit.router.abstraction import IInboxKitRouter
 from inboxkit.services.inbox import InboxService
 from inboxkit.services.providers.abstraction import (
     IProviderGenerateService,
@@ -39,7 +39,7 @@ _DELETE_MESSAGE_METHODS = (
 )
 
 
-class TempMail(ITempMailRouter):
+class InboxKit(IInboxKitRouter):
     """Common router for disposable-email operations.
 
     Two modes
@@ -56,18 +56,18 @@ class TempMail(ITempMailRouter):
 
     Examples::
 
-        from inboxkit import TempMail, RouterMode
+        from inboxkit import InboxKit, RouterMode
 
         # sticky — only mail.tm
-        tm = TempMail("mail.tm")
+        tm = InboxKit("mail.tm")
         inbox = tm.create()
 
         # fallback — internal default order
-        tm = TempMail()
+        tm = InboxKit()
         inbox = tm.create()
 
         # fallback — custom order
-        tm = TempMail(mode=RouterMode.FALLBACK, order=["tempmail.net", "mail.tm", "1secmail"])
+        tm = InboxKit(mode=RouterMode.FALLBACK, order=["tempmail.net", "mail.tm", "1secmail"])
         inbox = tm.create()
 
         # change order later
@@ -172,7 +172,7 @@ class TempMail(ITempMailRouter):
         mode: RouterMode | str,
         *,
         provider: str | None = None,
-    ) -> TempMail:
+    ) -> InboxKit:
         """Switch between sticky and fallback.
 
         Sticky requires ``provider`` (or an already pinned sticky provider).
@@ -203,7 +203,7 @@ class TempMail(ITempMailRouter):
         self._mode = resolved
         return self
 
-    def set_order(self, order: Sequence[str]) -> TempMail:
+    def set_order(self, order: Sequence[str]) -> InboxKit:
         """Set fallback try-order (aliases resolved; empty raises)."""
         self._order = self._normalize_order(order)
         self._svc._order = list(self._order)

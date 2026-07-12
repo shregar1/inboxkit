@@ -10,7 +10,7 @@ from inboxkit.enums import RouterMode
 from inboxkit.models import TempInbox
 
 
-class ITempMailRouter(IService):
+class IInboxKitRouter(IService):
     """Provider-agnostic facade: sticky or fallback minting."""
 
     @property
@@ -28,7 +28,7 @@ class ITempMailRouter(IService):
         """Canonical provider names available to this router."""
 
     @abstractmethod
-    def set_order(self, order: Sequence[str]) -> ITempMailRouter:
+    def set_order(self, order: Sequence[str]) -> IInboxKitRouter:
         """Set fallback provider order (aliases resolved to canonical)."""
 
     @abstractmethod

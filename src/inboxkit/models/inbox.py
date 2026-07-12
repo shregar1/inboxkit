@@ -10,7 +10,7 @@ from inboxkit.errors import InboxNotBoundError
 
 @dataclass
 class TempInbox:
-    """Mailbox handle returned by ``TempMail.create()`` / provider mint.
+    """Mailbox handle returned by ``InboxKit.create()`` / provider mint.
 
     Includes the generated address **and** whatever credentials / session
     material the provider needs to read the inbox again (token, password,

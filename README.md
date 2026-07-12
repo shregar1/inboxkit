@@ -30,7 +30,7 @@ pip install -e ".[dev]"
 ```
 
 ```bash
-python -c "from inboxkit import TempMail, __version__; print(__version__, TempMail.DEFAULT_ORDER[:3])"
+python -c "from inboxkit import InboxKit, __version__; print(__version__, InboxKit.DEFAULT_ORDER[:3])"
 ```
 
 > Optional paid providers need env keys — see [Environment](#environment).
@@ -61,9 +61,9 @@ Also: `python -m inboxkit providers` · `python -m inboxkit version`
 ### 1. Sticky — pin one provider
 
 ```python
-from inboxkit import TempMail
+from inboxkit import InboxKit
 
-tm = TempMail("mail.tm")          # only this provider; no fallback
+tm = InboxKit("mail.tm")          # only this provider; no fallback
 inbox = tm.create()
 
 print(inbox.email)                # e.g. jane.doe42@mail.tm
@@ -75,15 +75,15 @@ print(inbox.to_dict())            # full serializable snapshot
 ### 2. Fallback — try until one works
 
 ```python
-from inboxkit import TempMail, RouterMode
+from inboxkit import InboxKit, RouterMode
 
-# uses TempMail.DEFAULT_ORDER internally
-tm = TempMail()
+# uses InboxKit.DEFAULT_ORDER internally
+tm = InboxKit()
 inbox = tm.create()
 print(inbox.email, "via", inbox.provider)
 
 # or your own order
-tm = TempMail(
+tm = InboxKit(
     mode=RouterMode.FALLBACK,
     order=["tempmail.net", "mail.tm", "1secmail", "guerrillamail"],
 )
@@ -99,9 +99,9 @@ inbox = tm.create()
 Typical signup flow: mint → submit the address somewhere → wait for the message.
 
 ```python
-from inboxkit import TempMail
+from inboxkit import InboxKit
 
-tm = TempMail("mail.tm")
+tm = InboxKit("mail.tm")
 inbox = tm.create()
 print("use this address:", inbox.email)
 
@@ -137,7 +137,7 @@ body = inbox.read_message(msgs[0])
 ### 4. One-shot overrides on `create()`
 
 ```python
-tm = TempMail()  # fallback
+tm = InboxKit()  # fallback
 
 # mint from a specific provider this call only
 inbox = tm.create("guerrillamail")
@@ -149,7 +149,7 @@ inbox = tm.create(order=["1secmail", "mail.tm", "tempmail.lol"])
 ### 5. Credentials you may need later
 
 ```python
-inbox = TempMail("mail.tm").create()
+inbox = InboxKit("mail.tm").create()
 
 inbox.email
 inbox.address
@@ -180,7 +180,7 @@ Example `credentials` shape (fields vary by provider):
 ### 6. Switch mode at runtime
 
 ```python
-tm = TempMail()  # started in fallback
+tm = InboxKit()  # started in fallback
 
 tm.set_mode("sticky", provider="mail.tm")
 tm.set_mode("fallback", provider="tempmail.net")  # prefer first in order
@@ -192,7 +192,7 @@ print(tm.providers())  # all registered names
 ### 7. Delete / destroy (when the provider supports it)
 
 ```python
-tm = TempMail("mail.tm")
+tm = InboxKit("mail.tm")
 inbox = tm.create()
 msgs = tm.list_messages(inbox)
 
@@ -206,15 +206,15 @@ tm.destroy(inbox)  # forget mailbox / account when supported
 
 ```python
 import os
-from inboxkit import TempMail
+from inboxkit import InboxKit
 
 # via env: SMAILPRO_API_KEY / TEMP_MAIL_API_KEY
-tm = TempMail("smailpro")
-tm = TempMail("temp-mail.org")
+tm = InboxKit("smailpro")
+tm = InboxKit("temp-mail.org")
 
 # or pass explicitly
-tm = TempMail("smailpro", api_key=os.environ["SMAILPRO_API_KEY"])
-tm = TempMail("temp-mail.org", api_key=os.environ["TEMP_MAIL_API_KEY"])
+tm = InboxKit("smailpro", api_key=os.environ["SMAILPRO_API_KEY"])
+tm = InboxKit("temp-mail.org", api_key=os.environ["TEMP_MAIL_API_KEY"])
 inbox = tm.create()
 ```
 
@@ -243,7 +243,7 @@ inbox = create_inbox("mail.tm")
 link = poll_verify_link(inbox, timeout_secs=180)
 ```
 
-Prefer `TempMail` for new code.
+Prefer `InboxKit` for new code.
 
 ---
 
@@ -251,7 +251,7 @@ Prefer `TempMail` for new code.
 
 | Problem | What this package does |
 | --- | --- |
-| Every temp-mail site has a different API | One `TempMail` router |
+| Every temp-mail site has a different API | One `InboxKit` router |
 | Providers go down / rate-limit | **Fallback mode** walks an order until mint succeeds |
 | You need the email *and* how to read it | `TempInbox` returns address + credentials + meta |
 | You still want raw SDKs | Per-provider generate/inbox services via `ProviderFactory` |
@@ -263,9 +263,9 @@ Built with SOLID layering: abstractions → factories → router → provider SD
 ## Router API (cheat sheet)
 
 ```python
-tm = TempMail("mail.tm")                 # sticky
-tm = TempMail()                          # fallback + DEFAULT_ORDER
-tm = TempMail(mode="fallback", order=[…])
+tm = InboxKit("mail.tm")                 # sticky
+tm = InboxKit()                          # fallback + DEFAULT_ORDER
+tm = InboxKit(mode="fallback", order=[…])
 
 tm.mode                                  # RouterMode.STICKY | FALLBACK
 tm.provider                              # pinned name, or None in fallback
@@ -296,7 +296,7 @@ tm.inbox_service("mail.tm")              # IProviderInboxService
 
 ## Providers
 
-Default fallback order (`TempMail.DEFAULT_ORDER`):
+Default fallback order (`InboxKit.DEFAULT_ORDER`):
 
 | # | Provider | Notes |
 | --- | --- | --- |
@@ -307,7 +307,7 @@ Default fallback order (`TempMail.DEFAULT_ORDER`):
 | 5 | `mail.tm` | Account + JWT (`api.mail.tm`) |
 | 6 | `maildrop` | GraphQL mailbox |
 | 7 | `tempy.email` | Tempy API |
-| 8 | `tempmail.lol` | TempMail.lol |
+| 8 | `tempmail.lol` | InboxKit.lol |
 | 9 | `temp-mail.app` | Site API |
 | 10 | `1secmail` | Also `secmail` |
 | 11 | `smailpro` | Sonjj API — requires `SMAILPRO_API_KEY` |
@@ -324,8 +324,8 @@ Aliases work everywhere (`mailtm` → `mail.tm`, `tempmailio` → `temp-mail.org
 | `SMAILPRO_API_KEY` | smailpro / Sonjj |
 
 ```python
-tm = TempMail("smailpro", api_key="…")          # or rely on env
-tm = TempMail("temp-mail.org", api_key="…")
+tm = InboxKit("smailpro", api_key="…")          # or rely on env
+tm = InboxKit("temp-mail.org", api_key="…")
 ```
 
 ---
@@ -340,13 +340,13 @@ src/inboxkit/
   errors/           typed errors + per-provider errors
   utilities/        HttpUtility, NameUtility, PasswordUtility, VerifyUtility
   factories/        ProviderFactory — builds generate/inbox services
-  router/           TempMail — public sticky / fallback facade
+  router/           InboxKit — public sticky / fallback facade
   services/         InboxService + providers/*/generate|inbox
 tests/              contract + surface + router tests
 ```
 
 ```text
-You ──► TempMail (router)
+You ──► InboxKit (router)
             │
             ├─ sticky ──► ProviderFactory.create_generate(name).mint()
             │
@@ -358,10 +358,10 @@ You ──► TempMail (router)
 DIP: inject a custom `ProviderFactory` or `order` in tests — no globals required.
 
 ```python
-from inboxkit import TempMail, ProviderFactory
+from inboxkit import InboxKit, ProviderFactory
 
 factory = ProviderFactory.default()
-tm = TempMail(mode="fallback", factory=factory, order=["mail.tm", "1secmail"])
+tm = InboxKit(mode="fallback", factory=factory, order=["mail.tm", "1secmail"])
 ```
 
 ---
@@ -372,6 +372,8 @@ tm = TempMail(mode="fallback", factory=factory, order=["mail.tm", "1secmail"])
 pip install -e ".[dev]"
 pytest
 ```
+
+Coverage is gated at **95%** (`fail_under` in `pyproject.toml`).
 
 ---
 

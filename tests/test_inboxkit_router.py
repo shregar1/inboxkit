@@ -1,4 +1,4 @@
-"""TempMail public router tests."""
+"""InboxKit public router tests."""
 
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ from inboxkit.errors import (
 )
 from inboxkit.factories import ProviderFactory, ProviderRegistration
 from inboxkit.models import TempInbox
-from inboxkit.router import ITempMailRouter, TempMail
+from inboxkit.router import IInboxKitRouter, InboxKit
 from inboxkit.services.providers.abstraction import (
     IProviderGenerateService,
     IProviderInboxService,
@@ -90,11 +90,11 @@ def _two_factory(*, a_fails: bool = False) -> ProviderFactory:
 
 
 def test_tempmail_is_router():
-    assert issubclass(TempMail, ITempMailRouter)
+    assert issubclass(InboxKit, IInboxKitRouter)
 
 
 def test_sticky_mode_pins_provider():
-    tm = TempMail("fake", factory=_simple_factory())
+    tm = InboxKit("fake", factory=_simple_factory())
     assert tm.mode is RouterMode.STICKY
     assert tm.provider == "fake"
     assert tm.create().provider == "fake"
@@ -102,12 +102,12 @@ def test_sticky_mode_pins_provider():
 
 def test_sticky_mode_requires_provider():
     with pytest.raises(BadInputError) as ei:
-        TempMail(mode=RouterMode.STICKY, factory=_simple_factory())
+        InboxKit(mode=RouterMode.STICKY, factory=_simple_factory())
     assert ei.value.code == "sticky_needs_provider"
 
 
 def test_fallback_uses_internal_order():
-    tm = TempMail(factory=_simple_factory())
+    tm = InboxKit(factory=_simple_factory())
     assert tm.mode is RouterMode.FALLBACK
     assert tm.provider is None
     assert tm.order == ["fake"]
@@ -116,7 +116,7 @@ def test_fallback_uses_internal_order():
 
 def test_fallback_custom_order_and_set_order():
     factory = _two_factory(a_fails=True)
-    tm = TempMail(mode="fallback", order=["a", "b"], factory=factory)
+    tm = InboxKit(mode="fallback", order=["a", "b"], factory=factory)
     assert tm.order == ["a", "b"]
     assert tm.create().provider == "b"
 
@@ -127,19 +127,19 @@ def test_fallback_custom_order_and_set_order():
 
 def test_fallback_one_shot_order():
     factory = _two_factory(a_fails=True)
-    tm = TempMail(mode=RouterMode.FALLBACK, order=["a", "b"], factory=factory)
+    tm = InboxKit(mode=RouterMode.FALLBACK, order=["a", "b"], factory=factory)
     assert tm.create(order=["b", "a"]).provider == "b"
 
 
 def test_create_provider_arg_is_one_shot_sticky():
     factory = _two_factory()
-    tm = TempMail(mode=RouterMode.FALLBACK, factory=factory)
+    tm = InboxKit(mode=RouterMode.FALLBACK, factory=factory)
     assert tm.create("a").provider == "a"
 
 
 def test_set_mode_sticky_and_fallback():
     factory = _two_factory()
-    tm = TempMail(mode=RouterMode.FALLBACK, factory=factory)
+    tm = InboxKit(mode=RouterMode.FALLBACK, factory=factory)
     tm.set_mode("sticky", provider="b")
     assert tm.mode is RouterMode.STICKY
     assert tm.provider == "b"
@@ -152,11 +152,11 @@ def test_set_mode_sticky_and_fallback():
 
 def test_empty_order_rejected():
     with pytest.raises(BadInputError):
-        TempMail(mode="fallback", order=[], factory=_simple_factory())
+        InboxKit(mode="fallback", order=[], factory=_simple_factory())
 
 
 def test_tempmail_create_list_read_delete_destroy():
-    tm = TempMail("fake", factory=_simple_factory())
+    tm = InboxKit("fake", factory=_simple_factory())
     assert tm.resolve("f") == "fake"
     inbox = tm.create()
     assert inbox.address == "a@fake.test"
@@ -168,7 +168,7 @@ def test_tempmail_create_list_read_delete_destroy():
 
 
 def test_tempmail_wait_for_message():
-    tm = TempMail("fake", factory=_simple_factory())
+    tm = InboxKit("fake", factory=_simple_factory())
     msg = tm.wait_for_message(tm.create(), timeout_secs=1, poll_every=0.01)
     assert msg["id"] == "1"
 
@@ -181,24 +181,24 @@ def test_tempmail_wait_for_message_timeout():
     factory = ProviderFactory(
         [ProviderRegistration("fake", (), _Gen, EmptyInbox)]
     )
-    tm = TempMail("fake", factory=factory)
+    tm = InboxKit("fake", factory=factory)
     with pytest.raises(VerifyTimeoutError):
         tm.wait_for_message(tm.create(), timeout_secs=0.05, poll_every=0.02)
 
 
 def test_tempmail_unknown_provider():
-    tm = TempMail(factory=_simple_factory())
+    tm = InboxKit(factory=_simple_factory())
     with pytest.raises(UnknownProviderError):
         tm.create("nope")
 
 
 def test_tempmail_unsupported_get_message():
-    tm = TempMail("fake", factory=_simple_factory())
+    tm = InboxKit("fake", factory=_simple_factory())
     with pytest.raises(UnprocessableError) as ei:
         tm.get_message(tm.create(), "1")
     assert ei.value.code == "get_message_unsupported"
 
 
 def test_default_order_constant():
-    assert TempMail.DEFAULT_ORDER
-    assert TempMail.default_order() == list(TempMail.DEFAULT_ORDER)
+    assert InboxKit.DEFAULT_ORDER
+    assert InboxKit.default_order() == list(InboxKit.DEFAULT_ORDER)

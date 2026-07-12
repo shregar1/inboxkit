@@ -6,7 +6,7 @@ from inboxkit.abstractions import IEnum
 
 
 class RouterMode(str, IEnum):
-    """How ``TempMail`` picks a provider when minting.
+    """How ``InboxKit`` picks a provider when minting.
 
     sticky
         User pinned one provider. Only that provider is used — no fallback.

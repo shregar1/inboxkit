@@ -14,7 +14,7 @@ def test_docs_returns_agent_guide():
     text = docs()
     assert "inboxkit agent handover guide" in text
     assert __version__ in text
-    assert "from inboxkit import TempMail" in text
+    assert "from inboxkit import InboxKit" in text
     assert "wait_for_link" in text
     assert "mail.tm" in text
 
@@ -29,7 +29,7 @@ def test_docs_can_omit_providers():
 def test_print_docs_writes_stdout():
     buf = io.StringIO()
     print_docs(buf)
-    assert "TempMail" in buf.getvalue()
+    assert "InboxKit" in buf.getvalue()
 
 
 def test_cli_docs_default(capsys):
@@ -38,9 +38,11 @@ def test_cli_docs_default(capsys):
     assert "agent handover guide" in out
 
 
-def test_cli_docs_explicit(capsys):
-    assert main(["docs"]) == 0
-    assert "wait_for_message" in capsys.readouterr().out
+def test_cli_docs_no_providers(capsys):
+    assert main(["docs", "--no-providers"]) == 0
+    out = capsys.readouterr().out
+    assert "agent handover guide" in out
+    assert "## Providers (default fallback order)" not in out
 
 
 def test_cli_providers(capsys):
@@ -53,3 +55,20 @@ def test_cli_providers(capsys):
 def test_cli_version(capsys):
     assert main(["version"]) == 0
     assert capsys.readouterr().out.strip() == __version__
+
+
+def test_cli_unknown_falls_through_to_help(capsys):
+    # argparse rejects unknown subcommands before main's fallback
+    with pytest.raises(SystemExit) as ei:
+        main(["nope"])
+    assert ei.value.code == 2
+
+
+def test_module_main_entrypoint(monkeypatch):
+    import runpy
+    import sys
+
+    monkeypatch.setattr(sys, "argv", ["inboxkit", "version"])
+    with pytest.raises(SystemExit) as ei:
+        runpy.run_module("inboxkit", run_name="__main__")
+    assert ei.value.code == 0

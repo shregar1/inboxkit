@@ -20,10 +20,10 @@ from typing import TextIO
 def docs(*, include_providers: bool = True) -> str:
     """Return the full agent handover guide as a single markdown string."""
     from inboxkit import __version__
-    from inboxkit.router.tempmail import TempMail
+    from inboxkit.router.inboxkit import InboxKit
 
-    order = ", ".join(TempMail.DEFAULT_ORDER)
-    providers = "\n".join(f"  - `{name}`" for name in TempMail.DEFAULT_ORDER)
+    order = ", ".join(InboxKit.DEFAULT_ORDER)
+    providers = "\n".join(f"  - `{name}`" for name in InboxKit.DEFAULT_ORDER)
 
     provider_block = ""
     if include_providers:
@@ -38,14 +38,14 @@ Aliases are accepted (e.g. `mailtm` → `mail.tm`, `secmail` → `1secmail`).
     return f"""# inboxkit agent handover guide (v{__version__})
 
 You are using **inboxkit** — a stdlib-only Python library that mints disposable
-email inboxes across multiple providers through one router: `TempMail`.
+email inboxes across multiple providers through one router: `InboxKit`.
 
 **Install:** `pip install git+https://github.com/shregar1/inboxkit.git`
 **Re-read this guide anytime:** `python -m inboxkit docs` or `from inboxkit import docs; print(docs())`
 
 ## Rules of thumb
 
-1. Prefer `from inboxkit import TempMail` for almost all work.
+1. Prefer `from inboxkit import InboxKit` for almost all work.
 2. Pass a provider name → **sticky** (that provider only, no fallback).
 3. Pass nothing / `mode="fallback"` → try providers in order until mint works.
 4. `create()` returns a `TempInbox` with `email`, `token`, `credentials`, `meta`.
@@ -57,9 +57,9 @@ email inboxes across multiple providers through one router: `TempMail`.
 ## Minimal sticky example
 
 ```python
-from inboxkit import TempMail
+from inboxkit import InboxKit
 
-tm = TempMail("mail.tm")
+tm = InboxKit("mail.tm")
 inbox = tm.create()
 print(inbox.email)
 print(inbox.credentials)   # auth needed to read this mailbox again
@@ -69,12 +69,12 @@ print(inbox.to_dict())     # full snapshot
 ## Minimal fallback example
 
 ```python
-from inboxkit import TempMail, RouterMode
+from inboxkit import InboxKit, RouterMode
 
-tm = TempMail()  # DEFAULT_ORDER
+tm = InboxKit()  # DEFAULT_ORDER
 inbox = tm.create()
 
-tm = TempMail(
+tm = InboxKit(
     mode=RouterMode.FALLBACK,
     order=["tempmail.net", "mail.tm", "1secmail", "guerrillamail"],
 )
@@ -85,9 +85,9 @@ print(inbox.email, "via", inbox.provider)
 ## Signup / verify-link recipe (most common agent task)
 
 ```python
-from inboxkit import TempMail
+from inboxkit import InboxKit
 
-tm = TempMail("mail.tm")
+tm = InboxKit("mail.tm")
 inbox = tm.create()
 email = inbox.email
 # → submit `email` to the target site (signup, magic link, reset, …)
@@ -114,7 +114,7 @@ body = inbox.read_message(msgs[0])
 ## One-shot create overrides
 
 ```python
-tm = TempMail()
+tm = InboxKit()
 inbox = tm.create("guerrillamail")  # this call only
 inbox = tm.create(order=["1secmail", "mail.tm"])
 ```
@@ -133,12 +133,12 @@ inbox = tm.create(order=["1secmail", "mail.tm"])
 | `inbox.list_messages()` | List messages (if bound) |
 | `inbox.read_message(msg)` | Read body (if bound) |
 
-## Router surface (`TempMail`)
+## Router surface (`InboxKit`)
 
 ```python
-tm = TempMail("mail.tm")                 # sticky
-tm = TempMail()                          # fallback + DEFAULT_ORDER
-tm = TempMail(mode="fallback", order=[…])
+tm = InboxKit("mail.tm")                 # sticky
+tm = InboxKit()                          # fallback + DEFAULT_ORDER
+tm = InboxKit(mode="fallback", order=[…])
 
 tm.mode / tm.provider / tm.order
 tm.providers()                           # registered names
@@ -166,10 +166,10 @@ Default fallback order:
 
 ```python
 import os
-from inboxkit import TempMail
+from inboxkit import InboxKit
 
-tm = TempMail("smailpro", api_key=os.environ["SMAILPRO_API_KEY"])
-tm = TempMail("temp-mail.org", api_key=os.environ["TEMP_MAIL_API_KEY"])
+tm = InboxKit("smailpro", api_key=os.environ["SMAILPRO_API_KEY"])
+tm = InboxKit("temp-mail.org", api_key=os.environ["TEMP_MAIL_API_KEY"])
 # or set env and omit api_key=
 ```
 
@@ -264,7 +264,7 @@ def main(argv: list[str] | None = None) -> int:
     import sys
 
     from inboxkit import __version__
-    from inboxkit.router.tempmail import TempMail
+    from inboxkit.router.inboxkit import InboxKit
 
     parser = argparse.ArgumentParser(
         prog="inboxkit",
@@ -300,15 +300,14 @@ def main(argv: list[str] | None = None) -> int:
         print_docs(include_providers=not getattr(args, "no_providers", False))
         return 0
     if command == "providers":
-        for name in TempMail.DEFAULT_ORDER:
+        for name in InboxKit.DEFAULT_ORDER:
             sys.stdout.write(f"{name}\n")
         return 0
     if command == "version":
         sys.stdout.write(f"{__version__}\n")
         return 0
 
-    parser.print_help()
-    return 2
+    raise AssertionError(f"unhandled command: {command!r}")
 
 
 __all__ = ["docs", "main", "print_docs"]
