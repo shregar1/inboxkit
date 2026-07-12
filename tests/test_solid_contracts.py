@@ -2,34 +2,26 @@
 
 from __future__ import annotations
 
-import sys
-from pathlib import Path
-
 import pytest
 
-# package lives in ~/Documents/inboxkit; parent must be on path
-_DOCS = Path(__file__).resolve().parents[2]
-if str(_DOCS) not in sys.path:
-    sys.path.insert(0, str(_DOCS))
-
-from inboxkit.errors import (  # noqa: E402
+from inboxkit.errors import (
     AllProvidersFailedError,
     BadInputError,
     InboxNotBoundError,
     UnknownProviderError,
     VerifyTimeoutError,
 )
-from inboxkit.errors.provider import IProviderError, MailTmError  # noqa: E402
-from inboxkit.models import TempInbox  # noqa: E402
-from inboxkit.services.inbox import InboxService  # noqa: E402
-from inboxkit.services.providers.abstraction import (  # noqa: E402
+from inboxkit.errors.provider import IProviderError, MailTmError
+from inboxkit.models import TempInbox
+from inboxkit.services.inbox import InboxService
+from inboxkit.services.providers.abstraction import (
     IProviderGenerateService,
     IProviderInboxService,
 )
-from inboxkit.services.providers.mailtm.generate import MailTmGenerateService  # noqa: E402
-from inboxkit.services.providers.mailtm.inbox import MailTmInboxService  # noqa: E402
-from inboxkit.services.providers.registry import ProviderSpec  # noqa: E402
-from inboxkit.services.providers.spec import ProviderSpec as SpecAlias  # noqa: E402
+from inboxkit.services.providers.mailtm.generate import MailTmGenerateService
+from inboxkit.services.providers.mailtm.inbox import MailTmInboxService
+from inboxkit.services.providers.registry import ProviderSpec
+from inboxkit.services.providers.spec import ProviderSpec as SpecAlias
 from inboxkit.utilities import VerifyUtility
 
 assert SpecAlias is ProviderSpec

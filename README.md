@@ -43,15 +43,23 @@ Built with SOLID layering: abstractions → factories → router → provider SD
 
 ## Install
 
-The package lives as an importable tree (no third-party deps beyond the stdlib):
+Stdlib only — no third-party runtime dependencies.
 
 ```bash
-# from the parent of the package directory
-export PYTHONPATH="/path/to/Documents:$PYTHONPATH"
-python -c "from inboxkit import TempMail; print(TempMail.DEFAULT_ORDER)"
+pip install git+https://github.com/shregar1/inboxkit.git
 ```
 
-Or add the parent folder to `sys.path` in your app / tests (as the included tests do).
+Editable (local clone):
+
+```bash
+git clone https://github.com/shregar1/inboxkit.git
+cd inboxkit
+pip install -e ".[dev]"
+```
+
+```bash
+python -c "from inboxkit import TempMail; print(TempMail.DEFAULT_ORDER)"
+```
 
 > Optional paid providers need env keys — see [Environment](#environment).
 

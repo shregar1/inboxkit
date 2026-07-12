@@ -29,6 +29,8 @@ Usage:
 
 from __future__ import annotations
 
+__version__ = "0.1.0"
+
 from inboxkit.abstractions import (
     IAbstraction,
     IConstant,
@@ -161,6 +163,7 @@ __all__ = [
     "UnprocessableError",
     "VerifyTimeoutError",
     "VerifyUtility",
+    "__version__",
     "create_inbox",
     "guerrillamail",
     "list_providers",
