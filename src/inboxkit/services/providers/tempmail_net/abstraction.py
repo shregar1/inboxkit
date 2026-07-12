@@ -11,7 +11,7 @@ from inboxkit.services.providers.abstraction import (
 
 
 class TempmailNetConfig:
-    """TempMail.net — https://tempmail.net/
+    """tempmail.net — https://tempmail.net/
 
     Same oturum-session stack as tempail.com (unofficial website API):
 

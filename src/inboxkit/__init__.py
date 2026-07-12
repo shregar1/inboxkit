@@ -84,8 +84,6 @@ from inboxkit.factories import (
 )
 from inboxkit.router import IInboxKitRouter, InboxKit
 
-TempMail = InboxKit  # back-compat alias
-
 from inboxkit.services import (
     InboxService,
     IProviderGenerateService,
@@ -157,7 +155,6 @@ __all__ = [
     "SmailProError",
     "TempInbox",
     "InboxKit",
-    "TempMail",
     "TempMailAppError",
     "TempMailError",
     "TempMailLolError",
