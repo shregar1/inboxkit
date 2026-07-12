@@ -33,6 +33,9 @@ classifiers = [
 ]
 dependencies = []
 
+[project.scripts]
+inboxkit = "inboxkit.docs:main"
+
 [project.optional-dependencies]
 dev = ["pytest>=7.0"]
 

@@ -37,6 +37,25 @@ python -c "from inboxkit import TempMail, __version__; print(__version__, TempMa
 
 ---
 
+## For AI agents
+
+New to this package? Load the built-in handover guide (recipes, API surface, pitfalls):
+
+```bash
+python -m inboxkit docs
+# or, after install:
+inboxkit docs
+```
+
+```python
+from inboxkit import docs
+print(docs())          # full markdown guide as a string
+```
+
+Also: `python -m inboxkit providers` · `python -m inboxkit version`
+
+---
+
 ## Usage
 
 ### 1. Sticky — pin one provider

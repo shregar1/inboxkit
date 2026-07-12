@@ -25,6 +25,10 @@ Usage:
   # fallback — custom order
   tm = TempMail(mode=RouterMode.FALLBACK, order=["tempmail.net", "mail.tm"])
   tm.set_order(["guerrillamail", "1secmail"])
+
+Agent handover (full usage guide):
+  python -m inboxkit docs
+  from inboxkit import docs; print(docs())
 """
 
 from __future__ import annotations
@@ -108,6 +112,7 @@ from inboxkit.utilities import (
     PasswordUtility,
     VerifyUtility,
 )
+from inboxkit.docs import docs, print_docs
 
 __all__ = [
     "AllProvidersFailedError",
@@ -165,11 +170,13 @@ __all__ = [
     "VerifyUtility",
     "__version__",
     "create_inbox",
+    "docs",
     "guerrillamail",
     "list_providers",
     "maildrop",
     "mailtm",
     "poll_verify_link",
+    "print_docs",
     "secmail",
     "smailpro",
     "temp_mail_app",
