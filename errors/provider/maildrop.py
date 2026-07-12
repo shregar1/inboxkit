@@ -1,0 +1,9 @@
+"""maildrop provider errors."""
+
+from __future__ import annotations
+
+from inboxkit.errors.provider.abstraction import IProviderError
+
+
+class MailDropError(IProviderError):
+    provider = "maildrop"

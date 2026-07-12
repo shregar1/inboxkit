@@ -1,0 +1,230 @@
+USE AT YOUR OWN WILL AND RISK
+================================
+
+This repository contains a free software tool ("the Software", "inboxkit").
+It is offered as a convenience for developers and testers. It is not a
+product, service, hosted platform, or managed offering.
+
+There is no copyright claim by the author intended to restrict your freedom
+to use, copy, modify, merge, publish, distribute, sublicense, or sell copies
+of the Software, for any purpose, without fee and without needing permission.
+
+
+1. NO WARRANTY
+--------------
+
+THE SOFTWARE IS PROVIDED "AS IS" AND "AS AVAILABLE", WITHOUT WARRANTY OF ANY
+KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF:
+
+  • merchantability
+  • fitness for a particular purpose
+  • non-infringement
+  • title
+  • accuracy, completeness, or currency of documentation
+  • uninterrupted or error-free operation
+  • compatibility with any third-party service, API, website, or network
+  • security, privacy, or confidentiality of any mailbox or message
+  • that the Software will meet your requirements or expectations
+
+You assume the entire risk arising out of use or performance of the Software.
+
+
+2. NO LIABILITY
+---------------
+
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL THE
+AUTHORS, CONTRIBUTORS, MAINTAINERS, OR ANYONE ASSOCIATED WITH DISTRIBUTION
+OF THE SOFTWARE BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY,
+WHETHER IN CONTRACT, TORT (INCLUDING NEGLIGENCE), STRICT LIABILITY, OR
+OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH:
+
+  • the Software or the use or other dealings in the Software
+  • any temporary email address created or used with the Software
+  • any message sent to, read from, lost by, or intercepted in such an inbox
+  • any account, signup, verification, or automation performed using such
+    an address
+  • any ban, captcha, rate limit, block, lawsuit, chargeback, or penalty
+    imposed by a third party
+  • any data loss, disclosure, identity theft, account takeover, spam,
+    phishing, malware, or fraud involving a temporary inbox
+  • any downtime, API change, or breakage of a third-party provider
+  • any indirect, incidental, special, consequential, punitive, or
+    exemplary damages, including lost profits, lost data, or business
+    interruption — even if advised of the possibility of such damages
+
+If your jurisdiction does not allow exclusion of certain warranties or
+limitation of certain damages, those limitations apply only to the extent
+legally enforceable; the rest of this document remains in effect.
+
+
+3. YOU USE IT AT YOUR OWN WILL
+--------------------------------
+
+By downloading, importing, running, embedding, or otherwise using the
+Software, you acknowledge and agree that:
+
+  a) You are acting voluntarily, of your own free will, and at your sole
+     discretion and risk.
+
+  b) Nobody is forcing, advising, or guaranteeing that you should use
+     temporary email, this Software, or any particular provider.
+
+  c) You alone decide whether temporary email is appropriate for your
+     situation.
+
+  d) If you do not agree with this document in full, you must not use the
+     Software.
+
+
+4. THIRD-PARTY SERVICES (CRITICAL)
+----------------------------------
+
+The Software talks to independent temporary-email and related services
+operated by third parties (websites, APIs, unofficial endpoints, etc.).
+Those parties are not affiliated with, endorsed by, controlled by, or
+guaranteed by the authors of this Software.
+
+You understand and accept that:
+
+  a) Each provider has its own Terms of Service, Acceptable Use Policy,
+     Privacy Policy, rate limits, authentication rules, and geographic
+     restrictions. You must read and comply with them yourself.
+
+  b) Providers may change, throttle, captcha-gate, block, or shut down
+     endpoints at any time without notice. The Software may break as a
+     result. That is expected risk, not a defect you can claim damages for.
+
+  c) Some integrations use undocumented or unofficial HTTP surfaces that
+     mirror a website. Those are inherently fragile and may violate a
+     provider's terms. Using them is entirely your choice and risk.
+
+  d) Official paid APIs (where supported) still require your own API keys,
+     accounts, billing, and compliance with that vendor's contract.
+
+  e) The authors do not operate mail servers for you, do not store your
+     mail, and cannot recover lost messages or addresses.
+
+
+5. NO SENSITIVE USE
+-------------------
+
+Temporary / disposable mailboxes are often public, shared, short-lived,
+guessable, or logged by the provider.
+
+DO NOT use this Software or any address it creates for:
+
+  • banking, payments, crypto, or financial accounts
+  • government, healthcare, legal, or employment identity
+  • primary personal email or long-term account recovery
+  • passwords, 2FA backup codes, private keys, or secrets
+  • anything you would not want a stranger to read
+
+If you do anyway, that is solely your responsibility.
+
+
+6. LAWFUL AND ETHICAL USE ONLY
+------------------------------
+
+You agree not to use the Software to:
+
+  • violate any law, regulation, or third-party right
+  • commit fraud, identity theft, impersonation, or phishing
+  • evade sanctions, age gates, or legally required identity checks where
+    doing so is unlawful
+  • spam, harass, abuse, or attack any person or system
+  • bypass security controls of a service in a way that is illegal or
+    clearly prohibited by that service's terms (you remain responsible for
+    interpreting those terms)
+  • distribute malware or conduct unauthorized access
+
+The Software is intended for legitimate development, testing, privacy
+sandboxing, and similar non-abusive purposes. Misuse is on you.
+
+
+7. AUTOMATION, SCRAPING, AND BOT DETECTION
+-----------------------------------------
+
+Automated access may trigger captchas, IP bans, legal notices, or account
+termination on third-party sites. The Software may surface errors such as
+captcha / bot challenges. That does not create any obligation for the
+authors to bypass protections, maintain workarounds, or keep unofficial
+endpoints working.
+
+You are responsible for:
+
+  • your network identity (IP, proxies, VPNs)
+  • request volume and timing
+  • any consequences of automation
+
+
+8. DATA, PRIVACY, AND SECRETS
+-----------------------------
+
+  a) Messages in temporary inboxes may be readable by others who know or
+     guess the address, or by the provider itself.
+
+  b) Credentials returned by the Software (tokens, passwords, cookies,
+     session ids) are sensitive within the scope of that disposable inbox.
+     Protect them in your own environment; the authors never receive them
+     unless you deliberately send them somewhere.
+
+  c) API keys you place in environment variables or pass into constructors
+     are your secrets. Do not commit them to public repositories.
+
+  d) The Software does not provide a privacy guarantee, encryption
+     guarantee, or data-processing agreement.
+
+
+9. SECURITY
+-----------
+
+No claim is made that the Software is free of bugs, vulnerabilities, or
+unsafe defaults. You should review the code, pin versions, and run it in
+an environment you trust. Report issues if you wish; there is no SLA for
+fixes.
+
+
+10. DOCUMENTATION AND EXAMPLES
+------------------------------
+
+README examples, comments, and docs are illustrative only. They may be
+incomplete or outdated. They do not expand warranties or create support
+obligations.
+
+
+11. INDEMNITY (WHERE ENFORCEABLE)
+---------------------------------
+
+To the extent permitted by law, you agree to defend and hold harmless the
+authors and contributors from claims, losses, and expenses (including
+reasonable legal fees) arising out of your use of the Software, your
+violation of this document, or your violation of any third-party rights
+or terms.
+
+
+12. NO SUPPORT CONTRACT
+-----------------------
+
+This tool is provided without obligation to provide support, updates,
+uptime, refunds, or consultation. Any help offered is discretionary and
+does not create a warranty.
+
+
+13. SEVERABILITY
+----------------
+
+If any provision of this document is held unenforceable, the remaining
+provisions continue in full force and effect.
+
+
+14. ENTIRE DISCLAIMER
+---------------------
+
+This document states the conditions under which the Software is offered.
+Using the Software constitutes acceptance. If you need a warranty,
+support contract, or hosted service — do not use this tool; obtain a
+commercial product that provides those guarantees.
+
+
+IF YOU DO NOT AGREE, DO NOT DOWNLOAD, IMPORT, RUN, OR DISTRIBUTE THIS
+SOFTWARE.
