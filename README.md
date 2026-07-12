@@ -11,34 +11,6 @@
 > for never putting sensitive mail in a throwaway inbox. Full text:
 > [LICENSE](./LICENSE).
 
-```python
-from inboxkit import TempMail
-
-tm = TempMail("mail.tm")          # sticky — pinned provider
-inbox = tm.create()
-
-print(inbox.email)                # jane.doe42@mail.tm
-print(inbox.credentials)          # token / password / session
-print(inbox.to_dict())            # full snapshot
-
-msgs = tm.list_messages(inbox)
-body = tm.read_message(inbox, msgs[0])
-link = tm.wait_for_link(inbox, timeout_secs=120)
-```
-
----
-
-## Why
-
-| Problem | What this package does |
-| --- | --- |
-| Every temp-mail site has a different API | One `TempMail` router |
-| Providers go down / rate-limit | **Fallback mode** walks an order until mint succeeds |
-| You need the email *and* how to read it | `TempInbox` returns address + credentials + meta |
-| You still want raw SDKs | Per-provider generate/inbox services via `ProviderFactory` |
-
-Built with SOLID layering: abstractions → factories → router → provider SDKs.
-
 ---
 
 ## Install
@@ -58,41 +30,40 @@ pip install -e ".[dev]"
 ```
 
 ```bash
-python -c "from inboxkit import TempMail; print(TempMail.DEFAULT_ORDER)"
+python -c "from inboxkit import TempMail, __version__; print(__version__, TempMail.DEFAULT_ORDER[:3])"
 ```
 
 > Optional paid providers need env keys — see [Environment](#environment).
 
 ---
 
-## Quick start
+## Usage
 
-### Sticky mode
-
-Pin one provider. No fallback.
+### 1. Sticky — pin one provider
 
 ```python
 from inboxkit import TempMail
 
-tm = TempMail("tempmail.net")
+tm = TempMail("mail.tm")          # only this provider; no fallback
 inbox = tm.create()
 
-assert tm.mode.value == "sticky"
-assert tm.provider == "tempmail.net"
+print(inbox.email)                # e.g. jane.doe42@mail.tm
+print(inbox.provider)             # mail.tm
+print(inbox.credentials)          # token / password / session bundle
+print(inbox.to_dict())            # full serializable snapshot
 ```
 
-### Fallback mode
-
-Try providers in order until one mints successfully.
+### 2. Fallback — try until one works
 
 ```python
 from inboxkit import TempMail, RouterMode
 
-# internal DEFAULT_ORDER
+# uses TempMail.DEFAULT_ORDER internally
 tm = TempMail()
 inbox = tm.create()
+print(inbox.email, "via", inbox.provider)
 
-# your order
+# or your own order
 tm = TempMail(
     mode=RouterMode.FALLBACK,
     order=["tempmail.net", "mail.tm", "1secmail", "guerrillamail"],
@@ -101,29 +72,80 @@ inbox = tm.create()
 
 # change order later
 tm.set_order(["maildrop", "tempy.email"])
+inbox = tm.create()
 ```
 
-### What `create()` returns
+### 3. Read mail and grab a verify link
 
-A `TempInbox` with everything needed to use the mailbox again:
+Typical signup flow: mint → submit the address somewhere → wait for the message.
 
 ```python
-inbox = tm.create()
+from inboxkit import TempMail
 
-inbox.email           # generated address
-inbox.address         # same
-inbox.token           # session / JWT / API material
-inbox.password        # when the provider uses one (e.g. mail.tm)
-inbox.local           # local-part
-inbox.domain          # domain
-inbox.display_name    # if minted
-inbox.view_url        # web UI hint when available
-inbox.credentials     # auth bundle
-inbox.meta            # every provider-specific field
-inbox.to_dict()       # full serializable snapshot
+tm = TempMail("mail.tm")
+inbox = tm.create()
+print("use this address:", inbox.email)
+
+# … register / request reset with inbox.email …
+
+# block until a message arrives
+msg = tm.wait_for_message(inbox, timeout_secs=120)
+print(msg)  # provider-shaped dict (subject, id, …)
+
+body = tm.read_message(inbox, msg)
+print(body)
+
+# or jump straight to the first http(s) link in any new mail
+link = tm.wait_for_link(inbox, timeout_secs=180)
+print("verify:", link)
 ```
 
-Example credential shape (provider-dependent):
+You can also poll yourself:
+
+```python
+msgs = tm.list_messages(inbox)
+if msgs:
+    body = tm.read_message(inbox, msgs[0])
+```
+
+`TempInbox` also binds list/read when minted:
+
+```python
+msgs = inbox.list_messages()
+body = inbox.read_message(msgs[0])
+```
+
+### 4. One-shot overrides on `create()`
+
+```python
+tm = TempMail()  # fallback
+
+# mint from a specific provider this call only
+inbox = tm.create("guerrillamail")
+
+# mint with a one-shot fallback order
+inbox = tm.create(order=["1secmail", "mail.tm", "tempmail.lol"])
+```
+
+### 5. Credentials you may need later
+
+```python
+inbox = TempMail("mail.tm").create()
+
+inbox.email
+inbox.address
+inbox.token
+inbox.password        # when the provider uses one (e.g. mail.tm)
+inbox.local
+inbox.domain
+inbox.display_name
+inbox.view_url
+inbox.credentials     # auth bundle for re-access
+inbox.meta            # every provider-specific field
+inbox.to_dict()
+```
+
+Example `credentials` shape (fields vary by provider):
 
 ```python
 {
@@ -136,9 +158,90 @@ Example credential shape (provider-dependent):
 }
 ```
 
+### 6. Switch mode at runtime
+
+```python
+tm = TempMail()  # started in fallback
+
+tm.set_mode("sticky", provider="mail.tm")
+tm.set_mode("fallback", provider="tempmail.net")  # prefer first in order
+tm.set_order(["mail.tm", "1secmail"])
+print(tm.mode, tm.provider, tm.order)
+print(tm.providers())  # all registered names
+```
+
+### 7. Delete / destroy (when the provider supports it)
+
+```python
+tm = TempMail("mail.tm")
+inbox = tm.create()
+msgs = tm.list_messages(inbox)
+
+if msgs:
+    tm.delete_message(inbox, msgs[0].get("id") or msgs[0])
+
+tm.destroy(inbox)  # forget mailbox / account when supported
+```
+
+### 8. Paid / keyed providers
+
+```python
+import os
+from inboxkit import TempMail
+
+# via env: SMAILPRO_API_KEY / TEMP_MAIL_API_KEY
+tm = TempMail("smailpro")
+tm = TempMail("temp-mail.org")
+
+# or pass explicitly
+tm = TempMail("smailpro", api_key=os.environ["SMAILPRO_API_KEY"])
+tm = TempMail("temp-mail.org", api_key=os.environ["TEMP_MAIL_API_KEY"])
+inbox = tm.create()
+```
+
+### 9. Raw provider SDK (bypass the router)
+
+```python
+from inboxkit import ProviderFactory
+
+factory = ProviderFactory.default()
+
+gen = factory.create_generate("mail.tm")
+inbox = gen.mint()
+
+ib = factory.create_inbox("mail.tm")
+msgs = ib.list_messages(inbox)
+body = ib.read_message(inbox, msgs[0]) if msgs else ""
+```
+
+### 10. Thin helpers
+
+```python
+from inboxkit import create_inbox, list_providers, poll_verify_link
+
+print(list_providers())
+inbox = create_inbox("mail.tm")
+link = poll_verify_link(inbox, timeout_secs=180)
+```
+
+Prefer `TempMail` for new code.
+
 ---
 
-## Router API
+## Why
+
+| Problem | What this package does |
+| --- | --- |
+| Every temp-mail site has a different API | One `TempMail` router |
+| Providers go down / rate-limit | **Fallback mode** walks an order until mint succeeds |
+| You need the email *and* how to read it | `TempInbox` returns address + credentials + meta |
+| You still want raw SDKs | Per-provider generate/inbox services via `ProviderFactory` |
+
+Built with SOLID layering: abstractions → factories → router → provider SDKs.
+
+---
+
+## Router API (cheat sheet)
 
 ```python
 tm = TempMail("mail.tm")                 # sticky
@@ -211,7 +314,7 @@ tm = TempMail("temp-mail.org", api_key="…")
 ## Architecture
 
 ```
-inboxkit/
+src/inboxkit/
   abstractions/     I* contracts (IService, IFactory, IError, …)
   models/           TempInbox
   enums/            Provider, RouterMode
@@ -220,7 +323,7 @@ inboxkit/
   factories/        ProviderFactory — builds generate/inbox services
   router/           TempMail — public sticky / fallback facade
   services/         InboxService + providers/*/generate|inbox
-  tests/            contract + surface + router tests
+tests/              contract + surface + router tests
 ```
 
 ```text
@@ -236,34 +339,19 @@ You ──► TempMail (router)
 DIP: inject a custom `ProviderFactory` or `order` in tests — no globals required.
 
 ```python
-from inboxkit import TempMail, ProviderFactory, ProviderRegistration
+from inboxkit import TempMail, ProviderFactory
 
-factory = ProviderFactory([/* custom registrations */])
-tm = TempMail(mode="fallback", factory=factory, order=["a", "b"])
+factory = ProviderFactory.default()
+tm = TempMail(mode="fallback", factory=factory, order=["mail.tm", "1secmail"])
 ```
-
----
-
-## Lower-level helpers
-
-Still exported for scripts and apps:
-
-```python
-from inboxkit import create_inbox, list_providers, poll_verify_link
-
-inbox = create_inbox("mail.tm")
-link = poll_verify_link(inbox, timeout_secs=180)
-```
-
-Prefer `TempMail` for new code.
 
 ---
 
 ## Tests
 
 ```bash
-cd /path/to/Documents
-python -m pytest inboxkit/tests/ -q
+pip install -e ".[dev]"
+pytest
 ```
 
 ---
